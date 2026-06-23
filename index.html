@@ -1,360 +1,1018 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Harsh Shukla | Portfolio</title>
-  <meta name="description" content="Portfolio of Harsh Shukla - B.Tech IT Student and Aspiring AI Engineer." />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harsh Shukla | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#030303',
+                        cardBg: '#111111',
+                        accent: '#A855F7',
+                        textMain: '#F3F4F6',
+                        textMuted: '#c5c6c7'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🌌 Premium Typography Configuration -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
-  <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Custom dynamic specs & scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050507; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+        
+        .glow-effect:hover {
+            box-shadow: 0 0 24px rgba(168, 85, 247, 0.25);
+        }
+
+        h1, h2, h3, h4, nav a {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+        .font-tech {
+            font-family: 'Space Grotesk', sans-serif !important;
+        }
+    </style>
 </head>
+<body class="bg-darkBg text-textMain font-sans antialiased selection:bg-accent selection:text-darkBg relative min-h-screen overflow-x-hidden">
 
-<body>
+    <canvas id="bg-canvas" class="fixed inset-0 -z-10 pointer-events-none opacity-[0.25]"></canvas>
 
-  <header class="navbar">
-    <div class="container nav-container">
-      <div class="logo">Harsh<span>.</span></div>
-      <nav class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#skills">Skills</a>
-        <a href="#projects">Projects</a>
-        <a href="#cp">CP</a>
-        <a href="#certificates">Certificates</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <button class="theme-toggle" id="themeToggle">
-        <i class="fa-solid fa-moon"></i>
-      </button>
-      <button class="nav-toggle" id="navToggle">
-        <i class="fa-solid fa-bars"></i>
-      </button>
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        const connectionDistance = 110; 
+        let mouse = { x: null, y: null, radius: 150 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            
+            const particleCount = Math.min(80, Math.floor((canvas.width * canvas.height) / 18000));
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1, 
+                    vx: (Math.random() - 0.5) * 0.4, 
+                    vy: (Math.random() - 0.5) * 0.4
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(168, 85, 247, 0.4)'; 
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.08)'; 
+
+            for (let i = 0; i < particles.length; i++) {
+                let p1 = particles[i];
+                
+                ctx.beginPath();
+                ctx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                p1.x += p1.vx;
+                p1.y += p1.vy;
+
+                if (p1.x < 0 || p1.x > canvas.width) p1.vx *= -1;
+                if (p1.y < 0 || p1.y > canvas.height) p1.vy *= -1;
+
+                if (mouse.x !== null && mouse.y !== null) {
+                    let dx = p1.x - mouse.x;
+                    let dy = p1.y - mouse.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        let force = (mouse.radius - distance) / mouse.radius;
+                        p1.x += (dx / distance) * force * 2;
+                        p1.y += (dy / distance) * force * 2;
+                    }
+                }
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx = p1.x - p2.x;
+                    let dy = p1.y - p2.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < connectionDistance) {
+                        ctx.strokeStyle = `rgba(168, 85, 247, ${0.12 * (1 - dist / connectionDistance)})`;
+                        ctx.lineWidth = 0.6;
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        animate();
+    </script>
+
+    <header class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl">
+        <nav class="bg-cardBg/80 backdrop-blur-md border border-gray-800 rounded-full px-6 py-3 flex justify-between items-center shadow-lg">
+            <a href="#" class="text-accent font-bold tracking-wider text-sm md:text-base">HARSH.</a>
+            <div class="flex items-center gap-4 md:gap-6 text-xs md:text-sm font-medium tracking-wide">
+                <a href="#about" class="hover:text-accent transition-colors">About</a>
+                <a href="#projects" class="hover:text-accent transition-colors">Projects</a>
+                <a href="#certifications" class="hover:text-accent transition-colors">Certifications</a>
+                <a href="#problem-solving" class="hover:text-accent transition-colors">Problem Solving</a>
+                <a href="#contact" class="hover:text-accent transition-colors">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="min-h-screen flex items-center pt-24 px-6 md:px-12 max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center w-full">
+            <div class="md:col-span-7 order-2 md:order-1 text-center md:text-left space-y-6">
+                <span class="text-accent uppercase text-xs tracking-widest font-semibold bg-accent/10 px-3 py-1 rounded-full">Available for Opportunities</span>
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-none">
+                    Hey, I'm <span class="text-accent">Harsh</span>.<br>
+                    I build Intelligent systems.
+                </h1>
+                <p class="text-textMuted text-base md:text-lg max-w-xl leading-relaxed">
+                    I specialize in engineering autonomous AI agents, designing ML-affiliated workflows, and building smart automation pipelines.  
+                </p>
+                
+                <div class="flex flex-wrap gap-5 justify-center md:justify-start text-xl pt-4">
+                    <a href="https://www.linkedin.com/in/harsh-shukla-7b1a40329/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      class="group relative flex items-center justify-center w-11 h-11 rounded-lg bg-cardBg/40 border border-gray-800 text-gray-400 hover:text-[#0a66c2] hover:border-[#0a66c2]/50 hover:shadow-[0_0_15px_rgba(10,102,194,0.2)] transition-all duration-300 transform hover:-translate-y-1"
+                      title="LinkedIn">
+                      <i class="fab fa-linkedin text-xl transition-transform duration-300 group-hover:scale-110"></i>
+                    </a>
+                    <a href="https://github.com/Harshtaker" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      class="group relative flex items-center justify-center w-11 h-11 rounded-lg bg-cardBg/40 border border-gray-800 text-gray-400 hover:text-white hover:border-gray-600 hover:shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all duration-300 transform hover:-translate-y-1"
+                      title="GitHub">
+                      <i class="fab fa-github text-xl transition-transform duration-300 group-hover:scale-110"></i>
+                    </a>
+                    <a href="https://drive.google.com/file/d/1Nrz3_7JxpTp4hU0EkST7gvDhqQpae22k/view?usp=sharing" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="group relative flex items-center justify-center w-11 h-11 rounded-lg bg-cardBg/40 border border-gray-800 text-gray-400 hover:text-accent hover:border-accent/50 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)] transition-all duration-300 transform hover:-translate-y-1"
+                       title="Resume">
+                       <i class="fa-solid fa-file text-lg transition-transform duration-300 group-hover:scale-110"></i>
+                    </a>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-4">
+                    <a href="#projects" class="group relative inline-flex items-center justify-center gap-2 bg-accent text-darkBg font-semibold px-6 py-3 rounded-lg hover:bg-purple-400 transition-all duration-300 shadow-lg shadow-accent/20 transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto text-center">
+                       <span>See My Work</span>
+                       <span class="inline-block transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
+                    </a>
+                    <a href="#contact" class="inline-flex items-center justify-center border border-gray-700/80 bg-cardBg/40 backdrop-blur-sm text-gray-300 font-medium px-6 py-3 rounded-lg hover:border-accent hover:text-accent transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto text-center">
+                      Let's Connect
+                    </a>
+                </div>
+            </div>
+
+            <div class="md:col-span-5 order-1 md:order-2 flex justify-center items-center">
+                <div class="relative group w-64 md:w-80 aspect-[3/4] rounded-3xl transition-transform duration-500 hover:scale-[1.03]">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
+                    <div class="relative w-full h-full rounded-3xl overflow-hidden border border-gray-800/80 bg-cardBg/20 backdrop-blur-sm shadow-2xl">
+                        <img src="assest/harsh.png" alt="Harsh Shukla" class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105">
+                        
+                        <div class="absolute inset-0 shadow-[inset_0_0_24px_rgba(0,0,0,0.95),_inset_0_0_12px_rgba(0,0,0,0.9)] pointer-events-none"></div>
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-transparent to-transparent opacity-85 pointer-events-none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         ⚡ NEW TARIKA: VERTICAL PARADIGM (CENTERED ABOUT ME + MODULAR TERMINAL ARSENAL)
+         ========================================================================== -->
+    <section id="about" class="py-28 px-6 md:px-12 lg:px-24 max-w-6xl mx-auto border-t border-gray-900/60 bg-transparent space-y-24">
+        
+        <!-- 🟢 1. Centered Conversational Narrative Block -->
+        <div class="text-center space-y-6 max-w-4xl mx-auto">
+            <div class="space-y-2">
+                <h2 class="text-3xl md:text-5xl font-black tracking-tight text-textMain pt-2">About Me</h2>
+            </div>
+            
+            <div class="space-y-6 text-textMuted text-base md:text-lg leading-relaxed text-center">
+                <p>
+                    I am an IT student passionately transitioning from a foundational full-stack background into the domain of AI Engineering. My work focuses heavily on developing autonomous AI agents tailored for workflow automation, intelligent decision-making, and dynamic content generation. Moving past standard linear routines, I spend my time contributing to NLP-based solutions for sentiment analysis and fine-tuning internal tools that enhance overall agent reliability.
+                </p>
+                <p>
+                    Leveraging a strong core in Python, high-performance logic, and scalable web architectures, I look at applications as interconnected ecosystems. I am deeply passionate about creating reliable, user-friendly systems that bridge modern machine learning capabilities with production-ready execution.
+                </p>
+            </div>
+        </div>
+
+        <!-- 🟢 2. Custom Terminal Arsenal Grid (Bina Horizontal Gap Ke Symmetrical Stack) -->
+        <div class="space-y-10 w-full pt-12 border-t border-gray-900/40 font-tech">
+    <div class="text-center space-y-2">
+        <h3 class="text-2xl md:text-3xl font-black tracking-tight text-textMain uppercase tracking-wider">Technical Skills</h3>
+        <p class="text-sm text-textMuted">Core frameworks, engineering layers, and tools mapped by active execution depth.</p>
     </div>
-  </header>
 
-  <section id="home" class="hero">
-    <div class="container hero-container">
-      <div class="hero-text" data-aos="fade-right">
-        <p class="hero-tag">👋 Hi, I’m</p>
-        <h1 class="hero-title">Harsh <span>Shukla</span></h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+        
+        <div class="p-6 bg-cardBg/20 border border-gray-800/80 rounded-2xl space-y-5 hover:border-gray-700 transition-all duration-300 group glow-effect">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-gray-800/40 border border-gray-700/50 flex items-center justify-center text-textMain text-lg font-bold">
+                    &lt;/&gt;
+                </div>
+                <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Languages & Logic</h4>
+            </div>
+            <p class="text-sm text-textMuted leading-relaxed">Developing core software architectures, backend micro-scripts, and structural algorithmic logic.</p>
+            
+            <div class="flex flex-col gap-3 pt-2">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fab fa-python text-emerald-400 text-xl"></i> Python
+                    </div>
+                    <span class="text-xs font-mono font-bold text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-md">Advanced / Production</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fa-solid fa-code text-blue-400 text-xl"></i> C / C++
+                    </div>
+                    <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 rounded-md">Data Structures</span>
+                </div>
 
-        <h2 class="hero-subtitle">
-          <span id="typedText"></span>
-          <span class="cursor">|</span>
-        </h2>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/40 opacity-70 w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-medium text-textMuted">
+                        <i class="fab fa-java text-orange-400 text-xl"></i> Java
+                    </div>
+                    <span class="text-xs font-mono text-textMuted bg-gray-800/30 px-3 py-1 rounded-md">Academic Basics</span>
+                </div>
+            </div>
+        </div>
 
-        <p class="hero-description">
-          B.Tech IT student and aspiring AI engineer, exploring web development, data structures, automation and intelligent systems.
-          I love turning ideas into working software using clean code and practical problem solving.
+        <div class="p-6 bg-cardBg/20 border border-purple-900/30 rounded-2xl space-y-5 hover:border-accent/40 transition-all duration-300 group glow-effect">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent text-lg">
+                    <i class="fa-solid fa-robot animate-pulse"></i>
+                </div>
+                <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">AI Engineering & Intelligence</h4>
+            </div>
+            <p class="text-sm text-textMuted leading-relaxed">Orchestrating agentic systems, managing semantic structures, and processing language workflows.</p>
+            
+            <div class="flex flex-col gap-3 pt-2">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-purple-500/30 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-accent">
+                        <i class="fa-solid fa-brain text-xl"></i> AI Agents for Automation
+                    </div>
+                    <span class="text-xs font-mono font-bold text-textMain bg-accent/30 border border-accent/40 px-3 py-1 rounded-md">Active Focus</span>
+                </div>
+
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fa-solid fa-bolt text-amber-400 text-xl"></i> Custom API Pipelines
+                    </div>
+                    <span class="text-xs font-mono font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-3 py-1 rounded-md">Workflow Integrated</span>
+                </div>
+
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fa-solid fa-chart-pie text-cyan-400 text-xl"></i> NLP Feedback Analysis
+                    </div>
+                    <span class="text-xs font-mono font-bold text-cyan-400 bg-cyan-400/10 border border-cyan-400/20 px-3 py-1 rounded-md">Sentiment Processing</span>
+                </div>
+
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/40 opacity-50 w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-medium text-textMuted">
+                        <i class="fa-solid fa-network-wired text-xl"></i> LangChain / RAG
+                    </div>
+                    <span class="text-xs font-mono text-textMuted bg-gray-800/30 px-3 py-1 rounded-md">Research</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 bg-cardBg/20 border border-gray-800/80 rounded-2xl space-y-5 hover:border-gray-700 transition-all duration-300 group glow-effect">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-gray-800/40 border border-gray-700/50 flex items-center justify-center text-cyan-400 text-lg">
+                    <i class="fab fa-react"></i>
+                </div>
+                <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Web Architecture</h4>
+            </div>
+            <p class="text-sm text-textMuted leading-relaxed">Architecting secure interfaces, routing server modules, and developing progressive offline systems.</p>
+            
+            <div class="flex flex-col gap-3 pt-2">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fab fa-node-js text-green-500 text-xl"></i> Node.js & React
+                    </div>
+                    <span class="text-xs font-mono font-bold text-green-400 bg-green-400/10 border border-green-400/20 px-3 py-1 rounded-md">Full MERN Stack</span>
+                </div>
+
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fa-solid fa-layer-group text-purple-400 text-xl"></i> HTML5 / CSS & Tailwind
+                    </div>
+                    <span class="text-xs font-mono font-bold text-purple-400 bg-purple-400/10 border border-purple-400/20 px-3 py-1 rounded-md">UI Optimization</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 bg-cardBg/20 border border-gray-800/80 rounded-2xl space-y-5 hover:border-gray-700 transition-all duration-300 group glow-effect">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-gray-800/40 border border-gray-700/50 flex items-center justify-center text-amber-500 text-lg">
+                    <i class="fa-solid fa-gears"></i>
+                </div>
+                <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Tooling & Automation</h4>
+            </div>
+            <p class="text-sm text-textMuted leading-relaxed">Configuring version deployment repositories, asynchronous sync layers, and internal web pipelines.</p>
+            
+            <div class="flex flex-col gap-3 pt-2">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fab fa-github text-xl"></i> Git & GitHub
+                    </div>
+                    <span class="text-xs font-mono font-bold text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-md">Version Control</span>
+                </div>
+
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fa-solid fa-database text-orange-400 text-xl"></i> Supabase / SQL
+                    </div>
+                    <span class="text-xs font-mono font-bold text-orange-400 bg-orange-400/10 border border-orange-400/20 px-3 py-1 rounded-md">Data Storage</span>
+                </div>
+
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-gray-800/80 hover:border-gray-700 transition-colors w-full">
+                    <div class="flex items-center gap-3 text-base md:text-lg font-semibold text-textMain">
+                        <i class="fa-solid fa-circle-play text-blue-400 text-xl"></i> GitHub Actions
+                    </div>
+                    <span class="text-xs font-mono font-bold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-3 py-1 rounded-md">CI Automation</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+    </section>
+
+     <!-- ==========================================================================
+     🌌 MY PROJECTS SECTION (PREMIUM BANNER IMAGES & ENLARGED CONTRAST TECH STACKS)
+     ========================================================================== -->
+<section id="projects" class="py-28 px-6 md:px-16 lg:px-24 w-full border-t border-gray-900/60 bg-transparent space-y-12">
+    
+    <!-- Centered Header -->
+    <div class="text-center space-y-3 max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-black tracking-tight text-textMain">My Projects</h2>
+        <p class="text-sm text-textMuted max-w-md mx-auto">Open-source automation engines, AI workflows, and live production deployments.</p>
+    </div>
+
+    <!-- Horizontal Flow Canvas (3D Tilt & Image ready cards) -->
+    <div id="project-carousel" class="flex gap-6 overflow-x-auto pb-8 pt-4 w-full scrollbar-none snap-x snap-mandatory scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
+        
+        <!-- Project 1: Smart Google Maps Scraper -->
+        <div class="matrix-project-card snap-start shrink-0 w-[320px] md:w-[380px] bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px]">
+            <div class="space-y-4">
+                <!-- 📸 Project Banner Container: Image Layer Ready -->
+                <div class="h-44 border-b border-gray-900 relative p-6 flex flex-col justify-between overflow-hidden bg-gradient-to-br from-purple-950/20 to-black">
+                    <!-- Dynamic Banner Image Element (Change src path smoothly) -->
+                    <img src="assest/maps-scraper-banner.png" alt="Smart Maps Scraper View" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent relative z-10"><i class="fa-solid fa-location-crosshairs animate-pulse"></i></div>
+                    <span class="text-[10px] font-tech font-bold uppercase tracking-widest text-textMuted/60 bg-black/60 px-2 py-1 border border-gray-800 w-fit rounded relative z-10">100% Free / Open-Source</span>
+                </div>
+                
+                <div class="p-6 pt-2 space-y-3">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Smart Maps Scraper</h4>
+                    <div class="project-desc-container">
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed inline project-text-short">An automated extraction agent that pulls validated lead data (Name, Website, Email, Phone) directly from Google Maps using raw Python filters.</p>
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed hidden project-text-full"> Requires no paid subscriptions, third-party proxies, or hidden API keys. Engineered for growth hacking pipelines and structured database compilation.</p>
+                        <button onclick="toggleProjectDesc(this)" class="text-xs font-mono font-bold text-accent hover:underline ml-1 focus:outline-none">Read more</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ⚡ Scaled Up Tech Stack Dock -->
+            <div class="p-6 pt-0 space-y-5">
+                <div class="flex flex-wrap gap-2 text-xs md:text-sm font-tech">
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMain font-medium flex items-center gap-1.5"><i class="fab fa-python text-emerald-400"></i> Python</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMuted flex items-center gap-1.5"><i class="fa-solid fa-gears text-purple-400"></i> Automation</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMuted flex items-center gap-1.5"><i class="fa-solid fa-database text-blue-400"></i> LeadGen</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="https://github.com/Harshtaker/smart-maps-scraper" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                        <i class="fab fa-github text-base"></i> Repository
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project 2: LinkedIn Content Creator AI -->
+        <div class="matrix-project-card snap-start shrink-0 w-[320px] md:w-[380px] bg-cardBg/30 border border-purple-900/30 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px]">
+            <div class="space-y-4">
+                <!-- 📸 Project Banner Container: Image Layer Ready -->
+                <div class="h-44 border-b border-gray-900 relative p-6 flex flex-col justify-between overflow-hidden bg-gradient-to-br from-purple-950/20 to-black">
+                    <img src="assest/linkedin-ai-banner.png" alt="LinkedIn Content AI View" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent relative z-10"><i class="fa-solid fa-signature"></i></div>
+                    <span class="text-[10px] font-tech font-bold uppercase tracking-widest text-accent bg-accent/5 px-2 py-1 border border-accent/10 w-fit rounded relative z-10">Autonomous Content Agent</span>
+                </div>
+                
+                <div class="p-6 pt-2 space-y-3">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">LinkedIn Content Creater</h4>
+                    <div class="project-desc-container">
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed inline project-text-short">Built as part of an active AI development challenge, this system plans weekly timelines, drafts professional summaries matching a specific persona style,</p>
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed hidden project-text-full"> suggests optimized posting index intervals based on engagement metrics, and uses automated intelligence hooks to completely bypass writer's block.</p>
+                        <button onclick="toggleProjectDesc(this)" class="text-xs font-mono font-bold text-accent hover:underline ml-1 focus:outline-none">Read more</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ⚡ Scaled Up Tech Stack Dock -->
+            <div class="p-6 pt-0 space-y-5">
+                <div class="flex flex-wrap gap-2 text-xs md:text-sm font-tech">
+                    <span class="px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/20 text-accent font-semibold flex items-center gap-1.5"><i class="fab fa-python"></i> Python AI</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/20 text-accent font-semibold flex items-center gap-1.5"><i class="fa-solid fa-brain"></i> GenerativeAI</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/20 text-accent font-semibold flex items-center gap-1.5"><i class="fa-solid fa-network-wired"></i> Workflows</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="https://github.com/Harshtaker/linkedin-content-creator" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                        <i class="fab fa-github text-base"></i> Repository
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project 3: Multilingual Customer Feedback Analyzer -->
+        <div class="matrix-project-card snap-start shrink-0 w-[320px] md:w-[380px] bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px]">
+            <div class="space-y-4">
+                <!-- 📸 Project Banner Container: Image Layer Ready -->
+                <div class="h-44 border-b border-gray-900 relative p-6 flex flex-col justify-between overflow-hidden bg-gradient-to-br from-purple-950/20 to-black">
+                    <img src="assest/feedback-analyzer-banner.png" alt="Feedback NLP Analyzer View" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-gray-800/40 border border-gray-700/50 flex items-center justify-center text-cyan-400 relative z-10"><i class="fa-solid fa-chart-pie"></i></div>
+                    <span class="text-[10px] font-tech font-bold uppercase tracking-widest text-textMuted/60 bg-black/40 px-2 py-1 border border-gray-800 w-fit rounded relative z-10">NLP Analytics Module</span>
+                </div>
+                
+                <div class="p-6 pt-2 space-y-3">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Feedback NLP Analyzer</h4>
+                    <div class="project-desc-container">
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed inline project-text-short">An interactive dashboard utilizing NLTK and Deep Translator. Features robust cross-language auto-translation, structural sentiment tracking distribution metrics,</p>
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed hidden project-text-full"> and token keyword frequency parsing from uploaded dataset CSV records. Provides automated interactive dashboard visualizations via Streamlit setups smoothly.</p>
+                        <button onclick="toggleProjectDesc(this)" class="text-xs font-mono font-bold text-accent hover:underline ml-1 focus:outline-none">Read more</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ⚡ Scaled Up Tech Stack Dock -->
+            <div class="p-6 pt-0 space-y-5">
+                <div class="flex flex-wrap gap-2 text-xs md:text-sm font-tech">
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMain font-medium flex items-center gap-1.5"><i class="fa-solid fa-language text-cyan-400"></i> NLTK / NLP</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMain font-medium flex items-center gap-1.5"><i class="fa-solid fa-chart-simple text-emerald-400"></i> Streamlit</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMuted flex items-center gap-1.5"><i class="fa-solid fa-globe text-blue-400"></i> Deep Translator</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="https://github.com/Harshtaker/customer_feedback_analyzer" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                        <i class="fab fa-github text-base"></i> Repository
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project 4: Technical Council Production Portal -->
+        <div class="matrix-project-card snap-start shrink-0 w-[320px] md:w-[380px] bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px]">
+            <div class="space-y-4">
+                <!-- 📸 Project Banner Container: Image Layer Ready -->
+                <div class="h-44 border-b border-gray-900 relative p-6 flex flex-col justify-between overflow-hidden bg-gradient-to-br from-purple-950/20 to-black">
+                    <img src="assest/council-portal-banner.png" alt="Technical Council Portal View" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-gray-800/40 border border-gray-700/50 flex items-center justify-center text-blue-400 relative z-10"><i class="fab fa-react"></i></div>
+                    <span class="text-[10px] font-tech font-bold uppercase tracking-widest text-textMuted/60 bg-black/40 px-2 py-1 border border-gray-800 w-fit rounded relative z-10">Official Production Site</span>
+                </div>
+                
+                <div class="p-6 pt-2 space-y-3">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Technical Council Portal</h4>
+                    <div class="project-desc-container">
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed inline project-text-short">The core dynamic web terminal developed for our official college Technical Council infrastructure. Engineered using the MERN Stack and Supabase</p>
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed hidden project-text-full"> to structure asset distributions, gallery notices, and active team records flawlessly. Always awake configuration optimized for instantaneous loading responses.</p>
+                        <button onclick="toggleProjectDesc(this)" class="text-xs font-mono font-bold text-accent hover:underline ml-1 focus:outline-none">Read more</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ⚡ Scaled Up Tech Stack Dock -->
+            <div class="p-6 pt-0 space-y-5">
+                <div class="flex flex-wrap gap-2 text-xs md:text-sm font-tech">
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMain font-medium flex items-center gap-1.5"><i class="fab fa-node-js text-green-400"></i> MERN Stack</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMain font-medium flex items-center gap-1.5"><i class="fa-solid fa-database text-orange-400"></i> Supabase Database</span>
+                </div>
+                <div class="flex items-center gap-4 text-sm font-semibold">
+                    <a href="https://github.com/Harshtaker/technical-council-portal" target="_blank" class="text-accent hover:text-textMain transition-colors flex items-center gap-1.5">
+                        <i class="fab fa-github text-base"></i> Repo
+                    </a>
+                    <a href="https://technical-council-portal.vercel.app/" target="_blank" class="text-emerald-400 hover:text-textMain transition-colors flex items-center gap-1.5 pl-2">
+                        <i class="fa-solid fa-globe text-base"></i> Live site 
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project 5: Council Treasure Hunt PWA -->
+        <div class="matrix-project-card snap-start shrink-0 w-[320px] md:w-[380px] bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px]">
+            <div class="space-y-4">
+                <!-- 📸 Project Banner Container: Image Layer Ready -->
+                <div class="h-44 border-b border-gray-900 relative p-6 flex flex-col justify-between overflow-hidden bg-gradient-to-br from-purple-950/10 to-black">
+                    <img src="assest/treasure-hunt-banner.png" alt="Treasure Hunt PWA View" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-gray-800/40 border border-gray-700/50 flex items-center justify-center text-purple-400 relative z-10"><i class="fa-solid fa-mobile-screen"></i></div>
+                    <span class="text-[10px] font-tech font-bold uppercase tracking-widest text-textMuted/60 bg-black/40 px-2 py-1 border border-gray-800 w-fit rounded relative z-10">Progressive Web App</span>
+                </div>
+                
+                <div class="p-6 pt-2 space-y-3">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Treasure Hunt PWA</h4>
+                    <div class="project-desc-container">
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed inline project-text-short">A high-performance progressive app engineered for the Council's campus event. Integrated multi-team login verification setups,</p>
+                        <p class="text-sm md:text-base text-textMuted leading-relaxed hidden project-text-full"> real-time sync leaderboards via Supabase database calls, round-by-round time monitoring systems, live admin dashboard controls, and structural mid-game pauses for multi-stage tracking.</p>
+                        <button onclick="toggleProjectDesc(this)" class="text-xs font-mono font-bold text-accent hover:underline ml-1 focus:outline-none">Read more</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ⚡ Scaled Up Tech Stack Dock -->
+            <div class="p-6 pt-0 space-y-5">
+                <div class="flex flex-wrap gap-2 text-xs md:text-sm font-tech">
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMain font-medium flex items-center gap-1.5"><i class="fa-solid fa-mobile-screen text-indigo-400"></i> PWA Architecture</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMain font-medium flex items-center gap-1.5"><i class="fa-solid fa-database text-orange-400"></i> Supabase Sync</span>
+                    <span class="px-3 py-1.5 rounded-lg bg-black/40 border border-gray-800/80 text-textMuted flex items-center gap-1.5"><i class="fa-solid fa-bolt text-amber-400"></i> RealTime API</span>
+                </div>
+                <div class="flex items-center gap-4 text-sm font-semibold">
+                    <a href="https://github.com/Harshtaker/treasure-hunt" target="_blank" class="text-accent hover:text-textMain transition-colors flex items-center gap-1.5">
+                        <i class="fab fa-github text-base"></i> Code Base
+                    </a>
+                    <a href="https://treasure-hunt-two-kappa.vercel.app/" target="_blank" class="text-emerald-400 hover:text-textMain transition-colors flex items-center gap-1.5 pl-2">
+                        <i class="fa-solid fa-globe text-base"></i> Live App 
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🟢 Updated Navigation Controls Block Placed Below Cards Matrix Row -->
+    <div class="flex items-center justify-center gap-4 pt-4 w-full">
+        <button onclick="document.getElementById('project-carousel').scrollBy({left: -380, behavior: 'smooth'})" 
+                class="w-12 h-12 rounded-xl bg-cardBg/40 border border-gray-800 flex items-center justify-center text-textMuted hover:text-accent hover:border-accent/40 hover:bg-black/60 transition-all duration-300">
+            <i class="fa-solid fa-chevron-left text-base"></i>
+        </button>
+        
+        <!-- Symmetrical Dot Status Indicators Matrix -->
+        <div class="flex items-center gap-1.5 px-3">
+            <span class="w-2 h-2 rounded-full bg-accent"></span>
+            <span class="w-1.5 h-2 rounded-full bg-gray-800"></span>
+            <span class="w-1.5 h-2 rounded-full bg-gray-800"></span>
+        </div>
+
+        <button onclick="document.getElementById('project-carousel').scrollBy({left: 380, behavior: 'smooth'})" 
+                class="w-12 h-12 rounded-xl bg-cardBg/40 border border-gray-800 flex items-center justify-center text-textMuted hover:text-accent hover:border-accent/40 hover:bg-black/60 transition-all duration-300">
+            <i class="fa-solid fa-chevron-right text-base"></i>
+        </button>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     ⚙️ SCRIPT ATTACHMENT FOR INLINE CONTROL EXPANSION
+     ========================================================================== -->
+<script>
+    function toggleProjectDesc(btn) {
+        const container = btn.closest('.project-desc-container');
+        const fullText = container.querySelector('.project-text-full');
+        
+        if (fullText.classList.contains('hidden')) {
+            fullText.classList.remove('hidden');
+            fullText.classList.add('inline');
+            btn.textContent = 'Read less';
+        } else {
+            fullText.classList.add('hidden');
+            fullText.classList.remove('inline');
+            btn.textContent = 'Read more';
+        }
+    }
+</script>
+    <!-- ==========================================================================
+     🌌 VERIFIED CERTIFICATIONS MATRIX (HUMANIZED & ACCESSIBLE DISPLAY HUB)
+     ========================================================================== -->
+<section id="certifications" class="py-28 px-6 md:px-16 lg:px-24 w-full border-t border-gray-900/60 bg-transparent space-y-12">
+    
+    <!-- Centered Humanized Header -->
+    <div class="text-center space-y-3 max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-black tracking-tight text-textMain">Certifications</h2>
+        <p class="text-base text-textMuted max-w-md mx-auto">A collection of milestones from my learning journey, corporate simulations, and national hackathons.</p>
+    </div>
+    
+    <!-- Modern Grid Architecture (Syncs perfectly with 3D Tilt JavaScript) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+        
+        <!-- Certificate 1: AI Intern at Radian Marketing -->
+        <div class="matrix-project-card bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px] transition-all duration-500">
+            <div class="space-y-4">
+                <!-- 📸 Original Certificate Image Display Frame -->
+                <div class="h-48 border-b border-gray-900 relative overflow-hidden bg-gradient-to-br from-purple-950/20 to-black p-4 flex flex-col justify-between">
+                    <!-- Path to your certificate image (e.g., assets/radian-cert.jpg) -->
+                    <img src="assest/radian-marketing-certificate.png" alt="Radian Marketing AI Internship Certificate" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent relative z-10"><i class="fa-solid fa-robot"></i></div>
+                    <span class="text-xs font-semibold tracking-wide text-purple-400 bg-purple-400/5 px-2.5 py-1 border border-purple-400/10 rounded-md w-fit relative z-10">3-Month Internship</span>
+                </div>
+
+                <!-- Humanized Text Context -->
+                <div class="p-6 pt-0 space-y-2">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">AI Engineering Intern</h4>
+                    <p class="text-sm md:text-base text-textMuted font-medium">Issued by Radian Marketing</p>
+                    <p class="text-sm md:text-base text-textMuted leading-relaxed line-clamp-3">Completed a productive three-month term building automated AI systems, setting up agentic workflows, and deploying smart scripts for real-world marketing applications.</p>
+                </div>
+            </div>
+            <div class="p-6 pt-0 border-t border-gray-900/60 w-full">
+                <a href="https://drive.google.com/file/d/1A8F6AFS2yRa3br2Wi7d1h5jIqKQ4ff_v/view?usp=drive_link" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> View Certificate
+                </a>
+            </div>
+        </div>
+
+        <!-- Certificate 2: Deloitte Technology Job Simulation -->
+        <div class="matrix-project-card bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px] transition-all duration-500">
+            <div class="space-y-4">
+                <!-- 📸 Original Certificate Image Display Frame -->
+                <div class="h-48 border-b border-gray-900 relative overflow-hidden bg-gradient-to-br from-purple-950/20 to-black p-4 flex flex-col justify-between">
+                    <img src="assest/deloitte-certificate.png" alt="Deloitte Technology Simulation Certificate" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent relative z-10"><i class="fa-solid fa-terminal"></i></div>
+                    <span class="text-xs font-semibold tracking-wide text-blue-400 bg-blue-400/5 px-2.5 py-1 border border-blue-400/10 rounded-md w-fit relative z-10">Job Simulation</span>
+                </div>
+
+                <!-- Humanized Text Context -->
+                <div class="p-6 pt-0 space-y-2">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Technology Consulting</h4>
+                    <p class="text-sm md:text-base text-textMuted font-medium">Issued by Deloitte (via Forage)</p>
+                    <p class="text-sm md:text-base text-textMuted leading-relaxed line-clamp-3">Gained hands-on experience by tackling practical development tasks and architectural challenges mapped after real corporate tech consulting requirements.</p>
+                </div>
+            </div>
+            <div class="p-6 pt-0 border-t border-gray-900/60 w-full">
+                <a href="https://drive.google.com/file/d/1bnzJStU3uBsRKJfI3sLW3SIf_g6YeI9t/view?usp=drive_link" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> View Certificate
+                </a>
+            </div>
+        </div>
+
+        <!-- Certificate 3: NEC Advanced Track IIT Bombay -->
+        <div class="matrix-project-card bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px] transition-all duration-500">
+            <div class="space-y-4">
+                <!-- 📸 Original Certificate Image Display Frame -->
+                <div class="h-48 border-b border-gray-900 relative overflow-hidden bg-gradient-to-br from-purple-950/20 to-black p-4 flex flex-col justify-between">
+                    <img src="assest/iit-bombay-cert.png" alt="IIT Bombay NEC Advanced Track Certificate" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent relative z-10"><i class="fa-solid fa-users"></i></div>
+                    <span class="text-xs font-semibold tracking-wide text-amber-400 bg-amber-400/5 px-2.5 py-1 border border-amber-400/10 rounded-md w-fit relative z-10">National Finalist</span>
+                </div>
+
+                <!-- Humanized Text Context -->
+                <div class="p-6 pt-0 space-y-2">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">National Entrepreneurship Challenge</h4>
+                    <p class="text-sm md:text-base text-textMuted font-medium">Organized by E-Cell IIT Bombay</p>
+                    <p class="text-sm md:text-base text-textMuted leading-relaxed line-clamp-3">Successfully completed a rigid six-month entrepreneurial journey through the Advanced Track, focusing heavily on strategy execution and active collaboration.</p>
+                </div>
+            </div>
+            <div class="p-6 pt-0 border-t border-gray-900/60 w-full">
+                <a href="https://drive.google.com/file/d/1tuJ8K48qvMoxCNE0tO7x9PsTXGoSqHDV/view?usp=drive_link" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> View Certificate
+                </a>
+            </div>
+        </div>
+
+        <!-- Certificate 4: ICAT Internship Common Aptitude Test -->
+        <div class="matrix-project-card bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px] transition-all duration-500">
+            <div class="space-y-4">
+                <!-- 📸 Original Certificate Image Display Frame -->
+                <div class="h-48 border-b border-gray-900 relative overflow-hidden bg-gradient-to-br from-purple-950/20 to-black p-4 flex flex-col justify-between">
+                    <img src="assest/icat-certificate.png" alt="ICAT Certificate of Participation" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent relative z-10"><i class="fa-solid fa-id-card"></i></div>
+                    <span class="text-xs font-semibold tracking-wide text-textMuted/60 bg-black/40 px-2.5 py-1 border border-gray-800 rounded-md w-fit relative z-10">Participation</span>
+                </div>
+
+                <!-- Humanized Text Context -->
+                <div class="p-6 pt-0 space-y-2">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Internship Common Aptitude Test</h4>
+                    <p class="text-sm md:text-base text-textMuted font-medium">Official ICAT Assessment</p>
+                    <p class="text-sm md:text-base text-textMuted leading-relaxed line-clamp-3">Earned official participation recognition through the national engineering aptitude test module designed to evaluate programmatic logical foundations.</p>
+                </div>
+            </div>
+            <div class="p-6 pt-0 border-t border-gray-900/60 w-full">
+                <a href="https://drive.google.com/file/d/1NtD5znWz-sjfPOmVE8SAS8P7JQ4L2v1l/view?usp=drive_link" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> View Certificate
+                </a>
+            </div>
+        </div>
+
+        <!-- Certificate 5: ComSoc HackX 2025 -->
+        <div class="matrix-project-card bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px] transition-all duration-500">
+            <div class="space-y-4">
+                <!-- 📸 Original Certificate Image Display Frame -->
+                <div class="h-48 border-b border-gray-900 relative overflow-hidden bg-gradient-to-br from-purple-950/20 to-black p-4 flex flex-col justify-between">
+                    <img src="assest/hackx-certificate.png" alt="ComSoc HackX 2025 Certificate" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent relative z-10"><i class="fa-solid fa-fire"></i></div>
+                    <span class="text-xs font-semibold tracking-wide text-cyan-400 bg-cyan-400/5 px-2.5 py-1 border border-cyan-400/10 rounded-md w-fit relative z-10">Hackathon</span>
+                </div>
+
+                <!-- Humanized Text Context -->
+                <div class="p-6 pt-0 space-y-2">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">ComSoc HackX 2025</h4>
+                    <p class="text-sm md:text-base text-textMuted font-medium">Organized by Chandigarh University</p>
+                    <p class="text-sm md:text-base text-textMuted leading-relaxed line-clamp-3">Participated as an active development builder representing our college team structure in intense multi-hour problem-solving tracks.</p>
+                </div>
+            </div>
+            <div class="p-6 pt-0 border-t border-gray-900/60 w-full">
+                <a href="https://drive.google.com/file/d/1rq8F3GeIlDWXIoRAEaYHYzSO82mUQ8Vy/view?usp=drive_link" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                    <i class="fa-solid fa-arrow-up-right-from-square text Red-xs"></i> View Certificate
+                </a>
+            </div>
+        </div>
+
+        <!-- Certificate 6: National Financial Literacy Quiz 2026 -->
+        <div class="matrix-project-card bg-cardBg/30 border border-gray-800/80 rounded-2xl overflow-hidden group glow-effect flex flex-col justify-between min-h-[520px] transition-all duration-500">
+            <div class="space-y-4">
+                <!-- 📸 Original Certificate Image Display Frame -->
+                <div class="h-48 border-b border-gray-900 relative overflow-hidden bg-gradient-to-br from-purple-950/20 to-black p-4 flex flex-col justify-between">
+                    <img src="assest/financial-quiz-certificate.png" alt="Financial Literacy Quiz Certificate" 
+                         onerror="this.style.display='none'"
+                         class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 z-0">
+                    
+                    <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent relative z-10"><i class="fa-solid fa-coins"></i></div>
+                    <span class="text-xs font-semibold tracking-wide text-textMuted/60 bg-black/40 px-2.5 py-1 border border-gray-800 rounded-md w-fit relative z-10">College Round</span>
+                </div>
+
+                <!-- Humanized Text Context -->
+                <div class="p-6 pt-0 space-y-2">
+                    <h4 class="text-xl font-bold text-textMain group-hover:text-accent transition-colors">Financial Literacy Quiz</h4>
+                    <p class="text-sm md:text-base text-textMuted font-medium">Department of IT, REC Ambedkar Nagar</p>
+                    <p class="text-sm md:text-base text-textMuted leading-relaxed line-clamp-3">Participated in the university track rounds evaluating analytical thinking, resource handling, and economic management fundamentals.</p>
+                </div>
+            </div>
+            <div class="p-6 pt-0 border-t border-gray-900/60 w-full">
+                <a href="https://drive.google.com/file/d/1jN-EZPMqlYGEm8BYhOxM1KcPHmqZFAnL/view?usp=drive_link" target="_blank" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-textMain transition-colors">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> View Certificate
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+    <!-- ==========================================================================
+     🌌 COMPETITIVE PROGRAMMING & METRICS DASHBOARD (COMPACT HIGH-CONTRAST DATA GRID)
+     ========================================================================== -->
+<section id="problem-solving" class="py-24 px-6 md:px-16 lg:px-24 w-full border-t border-gray-900/60 bg-transparent space-y-12">
+    
+    <!-- Centered Header -->
+    <div class="text-center space-y-3 max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-black tracking-tight text-textMain">Problem Solving</h2>
+        <p class="text-sm md:text-base text-textMuted max-w-md mx-auto">Real-time competitive metrics, algorithmic tournament placements, and continuous performance statistics.</p>
+    </div>
+
+    <!-- Main Dynamic Layout Interface -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full items-start">
+        
+        <!-- Left Side: Compact Milestone Badges -->
+        <div class="lg:col-span-1 flex flex-col gap-4">
+            <!-- Metric 1: ClashCode Tournament Rank -->
+            <div class="p-5 bg-cardBg/30 border border-gray-800/80 rounded-xl flex items-center gap-4 group glow-effect transition-all duration-300">
+                <div class="w-12 h-12 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent text-xl shrink-0"><i class="fa-solid fa-trophy"></i></div>
+                <div>
+                    <div class="text-xl font-black text-accent">9th Rank</div>
+                    <h4 class="text-sm font-bold text-textMain">ClashCode Tournament</h4>
+                    <p class="text-xs text-textMuted mt-0.5">Top 10 finalist in Round 2 via Unstop platform.</p>
+                </div>
+            </div>
+
+            <!-- Metric 2: 30-Day Algorithm Sprint Complete -->
+            <div class="p-5 bg-cardBg/30 border border-purple-900/30 rounded-xl flex items-center gap-4 group glow-effect transition-all duration-300">
+                <div class="w-12 h-12 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent text-xl shrink-0"><i class="fa-solid fa-fire"></i></div>
+                <div>
+                    <div class="text-xl font-black text-accent">102+ Problems Solved</div>
+                    <h4 class="text-sm font-bold text-textMain">30-Day Streak Completed</h4>
+                    <p class="text-xs text-textMuted mt-0.5">Consistent daily resolution of data structure challenges.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Ultra-Sleek High-Contrast Profiles Analytics Row (Compact View) -->
+        <div class="lg:col-span-2 p-6 bg-cardBg/40 border border-gray-800/80 rounded-2xl glow-effect space-y-6">
+            <h3 class="text-base font-bold text-textMain tracking-wide uppercase font-tech text-accent/90">Verified Coding Profiles</h3>
+            
+            <div class="space-y-6">
+                <!-- Codeforces Interactive Metric Line -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-900/60">
+                    <div class="flex items-center gap-3 shrink-0">
+                        <i class="fa-solid fa-chart-simple text-amber-500 text-lg"></i>
+                        <div>
+                            <span class="font-bold text-base block text-textMain">Codeforces</span>
+                            <a href="https://codeforces.com/profile/Harshtaker" target="_blank" class="text-xs text-accent hover:underline font-mono">View Profile @Harshtaker</a>
+                        </div>
+                    </div>
+                    <!-- Big Metrics Display Stack -->
+                    <div class="flex flex-wrap items-center gap-6 text-left">
+                        <div>
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-textMuted block">Contest Rating</span>
+                            <span class="text-lg font-black text-textMain">822</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-textMuted block">Max Rating</span>
+                            <span class="text-base font-bold text-textMain">844 <span class="text-xs font-normal text-textMuted">(Newbie)</span></span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-textMuted block">Problems</span>
+                            <span class="text-lg font-black text-emerald-400">97</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CodeChef Interactive Metric Line -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+                    <div class="flex items-center gap-3 shrink-0">
+                        <i class="fa-solid fa-circle-nodes text-emerald-500 text-lg"></i>
+                        <div>
+                            <span class="font-bold text-base block text-textMain">CodeChef</span>
+                            <a href="https://www.codechef.com/users/harshtaker" target="_blank" class="text-xs text-accent hover:underline font-mono">View Profile @harshtaker</a>
+                        </div>
+                    </div>
+                    <!-- Big Metrics Display Stack -->
+                    <div class="flex flex-wrap items-center gap-6 text-left">
+                        <div>
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-textMuted block">Rating</span>
+                            <span class="text-lg font-black text-textMain">1262 <span class="text-xs font-mono font-normal text-textMuted">(Div 4)</span></span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-textMuted block">Highest</span>
+                            <span class="text-base font-bold text-textMain">1322</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-textMuted block">Stars</span>
+                            <span class="text-sm font-bold text-amber-400 font-mono"><i class="fa-solid fa-star text-xs"></i> 1 Star</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-textMuted block">Global Rank</span>
+                            <span class="text-sm font-bold text-textMain font-mono">68851</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-textMuted block">Country Rank</span>
+                            <span class="text-sm font-bold text-textMain font-mono">64517</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- ==========================================================================
+     🌌 CONTACT SECTION (CLEAN HUMANIZED FRONT-FACE WITH INTEGRATED WEB3FORM)
+     ========================================================================== -->
+<section id="contact" class="py-28 px-6 md:px-16 lg:px-24 w-full border-t border-gray-900/60 bg-transparent space-y-16 scroll-mt-20">
+    
+    <!-- Sophisticated Humanized Header Group -->
+    <div class="text-center space-y-4 max-w-4xl mx-auto">
+        <h3 class="text-3xl md:text-5xl font-black tracking-tight text-textMain">Let's connect to build something epic.</h3>
+        <p class="text-base text-textMuted max-w-2xl mx-auto leading-relaxed">
+            Whether you want to discuss algorithmic optimization, core AI agent design, or functional automation architecture, drop a message. I am always open to interesting collaborations and engineering challenges.
         </p>
+    </div>
 
-        <div class="hero-actions">
-          <a href="#projects" class="btn primary-btn">View Projects <i class="fa-solid fa-arrow-right"></i></a>
-          <a href="#contact" class="btn ghost-btn">Contact Me <i class="fa-solid fa-paper-plane"></i></a>
-        </div>
-
-        <div class="hero-links">
-          <a href="https://www.linkedin.com/in/harsh-shukla-7b1a40329/" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
-          <a href="https://github.com/Harshtaker" target="_blank"><i class="fa-brands fa-github"></i></a>
-          <a href="mailto:harshshukla0303@gmail.com"><i class="fa-solid fa-envelope"></i></a>
-        </div>
-      </div>
-
-      <div class="hero-right" data-aos="fade-left">
-        <div class="hero-card">
-          <div class="hero-avatar">
-            <img src="assest\harsh.jpg" alt="Harsh Shukla" />
-          </div>
-
-          <p class="hero-role">Technical Intern & Student</p>
-          <p class="hero-pill">AI • Web Dev • DSA</p>
-
-          <div class="hero-stats">
-            <div class="stat">
-              <h3>10+</h3>
-              <p>Mini Projects</p>
+    <!-- Integrated Contact Form Architecture -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start w-full">
+        
+        <!-- Left Side: Professional Bio & Direct Links -->
+        <div class="lg:col-span-2 space-y-8 text-center lg:text-left">
+            <div class="space-y-3">
+                <h4 class="text-2xl font-bold text-textMain tracking-tight">Harsh Shukla</h4>
+                <p class="text-base text-textMuted leading-relaxed">Focused on building intelligent workflows and automated systems with absolute precision. Based out of Ambedkar Nagar.</p>
             </div>
-            <div class="stat">
-              <h3>3+</h3>
-              <p>Major Builds</p>
+
+            <!-- High-Contrast Networks Area -->
+            <div class="space-y-4">
+                <h5 class="text-xs uppercase tracking-widest text-accent font-bold font-tech">Find Me On</h5>
+                <div class="flex justify-center lg:justify-start items-center gap-6 pt-1 text-3xl text-textMuted">
+                    <a href="https://www.linkedin.com/in/harsh-shukla-7b1a40329/" target="_blank" rel="noopener noreferrer" 
+                       class="hover:text-accent transition-all duration-300 transform hover:scale-110">
+                       <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="https://github.com/Harshtaker" target="_blank" rel="noopener noreferrer" 
+                       class="hover:text-accent transition-all duration-300 transform hover:scale-110">
+                       <i class="fab fa-github"></i>
+                    </a>
+                    <a href="mailto:harshshukla.rec@gmail.com" 
+                       class="hover:text-accent transition-all duration-300 transform hover:scale-110">
+                       <i class="fa-solid fa-envelope"></i>
+                    </a>
+                </div>
             </div>
-          </div>
+
+            <div class="text-sm text-textMuted/40 pt-16 hidden lg:block">
+                &copy; 2026 Harsh Shukla. All rights reserved.
+            </div>
         </div>
-      </div>
+
+        <!-- Right Side: Clean, High-Contrast Form Terminal (Pre-configured for Web3Forms) -->
+        <div class="lg:col-span-3 p-6 md:p-8 bg-cardBg/40 border border-gray-800/80 rounded-2xl glow-effect">
+            <form action="https://api.web3forms.com/submit" method="POST" class="space-y-6 text-base text-left">
+                <!-- ⚠️ CRITICAL: Replace with your actual Web3Forms Access Key ⚠️ -->
+                <input type="hidden" name="access_key" value="77a3dc33-901d-4af7-acb3-1f46d9d3ab71">
+                <input type="hidden" name="subject" value="New Portfolio Inquiry - Harsh Shukla">
+                <input type="hidden" name="from_name" value="Harsh Shukla Portfolio">
+                
+                <!-- Anti-Spam Honeypot Field -->
+                <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
+                <!-- Form Fields with Enhanced Large Fonts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                    <div class="space-y-2">
+                        <label for="name" class="font-bold text-textMain text-sm uppercase tracking-wide">Full Name</label>
+                        <input type="text" name="name" id="name" required placeholder="Your name"
+                               class="w-full p-3.5 rounded-xl bg-black/40 border border-gray-850 focus:border-accent focus:bg-black/60 focus:ring-1 focus:ring-accent text-textMain text-base placeholder:text-textMuted/40 transition-all">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="email" class="font-bold text-textMain text-sm uppercase tracking-wide">Email Address</label>
+                        <input type="email" name="email" id="email" required placeholder="your.email@example.com"
+                               class="w-full p-3.5 rounded-xl bg-black/40 border border-gray-850 focus:border-accent focus:bg-black/60 focus:ring-1 focus:ring-accent text-textMain text-base placeholder:text-textMuted/40 transition-all">
+                    </div>
+                </div>
+
+                <div class="space-y-2 w-full">
+                    <label for="message" class="font-bold text-textMain text-sm uppercase tracking-wide">Your Message</label>
+                    <textarea name="message" id="message" required rows="6" placeholder="Tell me about your project or opportunity..."
+                              class="w-full p-3.5 rounded-xl bg-black/40 border border-gray-850 focus:border-accent focus:bg-black/60 focus:ring-1 focus:ring-accent text-textMain text-base placeholder:text-textMuted/40 transition-all resize-none leading-relaxed"></textarea>
+                </div>
+
+                <div class="pt-2 w-full">
+                    <button type="submit" 
+                            class="inline-flex items-center gap-3 px-8 py-3.5 rounded-xl bg-accent text-cardBg font-black text-sm tracking-widest uppercase hover:scale-[1.03] active:scale-[0.97] transition-all w-full sm:w-fit justify-center shadow-lg shadow-accent/10">
+                        <i class="fa-solid fa-paper-plane text-xs"></i> Send Message
+                    </button>
+                </div>
+            </form>
+        </div>
 
     </div>
-  </section>
-
-  <section id="about" class="section">
-    <div class="container section-container" data-aos="fade-up">
-      <div class="section-header">
-        <h2>About <span>Me</span></h2>
-        <p>Who I am and what I do</p>
-      </div>
-
-      <div class="about-content">
-        <div class="about-text">
-          <p>I’m <strong>Harsh Shukla</strong>, a B.Tech IT student passionate about AI, automation, data structures, and full-stack web development.</p>
-          <p>I’ve worked on Bazario, a factory machine dashboard, a chatbot builder platform, LinkedIn automation tools, scrapers, and NLP-based feedback analyzers.</p>
-          <p>Currently learning and practicing DSA, C/C++, Python, JavaScript, and AI tools to build smarter, more useful systems.</p>
-
-          <div class="about-highlights">
-            <div class="chip"><i class="fa-solid fa-code"></i> Clean Code</div>
-            <div class="chip"><i class="fa-solid fa-brain"></i> AI Curious</div>
-            <div class="chip"><i class="fa-solid fa-rocket"></i> Project-Driven</div>
-          </div>
-        </div>
-
-        <div class="about-details">
-          <ul>
-            <li><span>Degree:</span> B.Tech in Information Technology</li>
-            <li><span>Focus:</span> AI, Web Dev, Automation</li>
-            <li><span>Location:</span> Uttar Pradesh, India</li>
-            <li><span>Availability:</span> Open for internships & collabs</li>
-          </ul>
-
-          <a href="#contact" class="btn secondary-btn">Let’s Connect <i class="fa-solid fa-comments"></i></a>
-        </div>
-      </div>
+    
+    <!-- Mobile Footer Text Alignment -->
+    <div class="text-xs text-textMuted/40 text-center pt-8 block lg:hidden">
+        &copy; 2026 Harsh Shukla. All rights reserved.
     </div>
-  </section>
+</section>
 
-  <section id="skills" class="section section-alt">
-    <div class="container section-container" data-aos="fade-up">
-      <div class="section-header">
-        <h2>Technical <span>Skills</span></h2>
-        <p>Tech stack I’m comfortable with</p>
-      </div>
-
-      <div class="skills-grid">
-
-        <div class="skill-card">
-          <h3>Core Languages</h3>
-          <ul>
-            <li>HTML</li>
-            <li>CSS</li>
-            <li>JavaScript</li>
-            <li>Python</li>
-            <li>C</li>
-            <li>C++</li>
-          </ul>
-        </div>
-
-        <div class="skill-card">
-          <h3>AI & Machine Learning</h3>
-          <ul>
-            <li>Generative AI</li>
-            <li>NLP</li>
-            <li>Prompt Engineering</li>
-            <li>LangChain / Agents</li>
-          </ul>
-        </div>
-
-        <div class="skill-card">
-          <h3>Automation & Tools</h3>
-          <ul>
-            <li>Web Scraping</li>
-            <li>Selenium / Playwright</li>
-            <li>API Automation</li>
-            <li>Data Extraction</li>
-          </ul>
-        </div>
-
-        <div class="skill-card">
-          <h3>CS Fundamentals</h3>
-          <ul>
-            <li>Data Structures & Algorithms</li>
-            <li>OOP</li>
-          </ul>
-        </div>
-
-        <div class="skill-card">
-          <h3>Developer Tools</h3>
-          <ul>
-            <li>Git & GitHub</li>
-            <li>VS Code</li>
-            <li>Debugging</li>
-          </ul>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <section id="projects" class="section">
-    <div class="container section-container" data-aos="fade-up">
-      <div class="section-header">
-        <h2>Selected <span>Projects</span></h2>
-        <p>Some things I’ve been working on</p>
-      </div>
-
-      <div class="projects-grid">
-
-        <article class="project-card">
-          <div class="project-tag">AI • Automation</div>
-          <h3>LinkedIn Content Creator</h3>
-          <p>AI tool that generates optimized LinkedIn posts using NLP, prompt templates, and tone presets.</p>
-          <ul class="project-points">
-            <li>AI content generation pipeline</li>
-            <li>Auto-formatting for LinkedIn posts</li>
-          </ul>
-          <div class="project-links">
-            <a href="https://github.com/Harshtaker/linkedin-content-creator"><i class="fa-brands fa-github"></i> Code</a>
-          </div>
-        </article>
-
-        <article class="project-card">
-          <div class="project-tag">Data • Scraping</div>
-          <h3>Smart Map Scraper</h3>
-          <p>Scrapes map-based business data like ratings, addresses, contacts, and categories with filters.</p>
-          <ul class="project-points">
-            <li>Location-based scraping flow</li>
-            <li>Exports structured CSV data</li>
-          </ul>
-          <div class="project-links">
-            <a href="https://github.com/Harshtaker/smart-maps-scraper"><i class="fa-brands fa-github"></i> Code</a>
-          </div>
-        </article>
-
-        <article class="project-card">
-          <div class="project-tag">AI • NLP</div>
-          <h3>Feedback Analyzer</h3>
-          <p>NLP tool that analyzes feedback and reviews for sentiment, issues, and common themes.</p>
-          <ul class="project-points">
-            <li>Sentiment scoring</li>
-            <li>Keyword and issue extraction</li>
-          </ul>
-          <div class="project-links">
-            <a href="https://github.com/Harshtaker/customer_feedback_analyzer"><i class="fa-brands fa-github"></i> Code</a>
-          </div>
-        </article>
-
-        <article class="project-card">
-          <div class="project-tag">Automation • Alerts</div>
-          <h3>Stock Notifier</h3>
-          <p>Real-time notifier that alerts when chosen stocks cross thresholds or show key movements.</p>
-          <ul class="project-points">
-            <li>Price triggers and watchlists</li>
-            <li>Telegram/Email notification integration</li>
-          </ul>
-          <div class="project-links">
-            <a href="https://github.com/Harshtaker"><i class="fa-brands fa-github"></i> Code</a>
-          </div>
-        </article>
-
-      </div>
-    </div>
-  </section>
-
-  <section id="cp" class="section">
-    <div class="container section-container" data-aos="fade-up">
-      <div class="section-header">
-        <h2>Competitive <span>Programming</span></h2>
-        <p>My coding profiles</p>
-      </div>
-
-      <div class="skills-grid">
-        <div class="skill-card">
-          <h3>Profiles</h3>
-
-          <ul>
-            <li><strong>Codeforces:</strong> <a href="https://codeforces.com/profile/Harshtaker" target="_blank">View Profile</a></li>
-            <li>Contest Rating: 822</li>
-            <li>Max Rating: 844 (Newbie)</li>
-            <li>Problems Solved: 97</li>
-          </ul>
-
-          <div style="height: 12px;"></div>
-
-          <ul>
-            <li><strong>CodeChef:</strong> <a href="https://www.codechef.com/users/Harshtaker" target="_blank">View Profile</a></li>
-            <li>Rating: 1262 (Div 4)</li>
-            <li>Highest Rating: 1322</li>
-            <li>Stars: ★</li>
-            <li>Global Rank: 68851</li>
-            <li>Country Rank: 64517</li>
-          </ul>
-
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="certificates" class="section section-alt">
-    <div class="container section-container" data-aos="fade-up">
-      <div class="section-header">
-        <h2>My <span>Certificates</span></h2>
-        <p>Verified achievements and skills</p>
-      </div>
-
-      <div class="projects-grid">
-        <article class="project-card">
-          <h3>Certificate of Completion</h3>
-          <p>Verified course certificate showcasing completed skills and learning.</p>
-          <div class="project-links">
-            <a href="https://drive.google.com/file/d/1bnzJStU3uBsRKJfI3sLW3SIf_g6YeI9t/view?usp=sharing" target="_blank">View Certificate</a>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section id="contact" class="section section-alt">
-    <div class="container section-container" data-aos="fade-up">
-      <div class="section-header">
-        <h2>Contact <span>Me</span></h2>
-        <p>Let’s work or learn together</p>
-      </div>
-
-      <div class="contact-grid">
-        <div class="contact-info">
-          <p>You can reach out for collaborations, projects, or discussions.</p>
-          <ul>
-            <li><i class="fa-solid fa-location-dot"></i> Uttar Pradesh, India</li>
-            <li><i class="fa-solid fa-envelope"></i> harshshukla0303@gmail.com</li>
-            <li><i class="fa-brands fa-linkedin"></i> <a href="https://www.linkedin.com/in/harsh-shukla-7b1a40329/" target="_blank">linkedin.com/in/harsh-shukla</a></li>
-            <li><i class="fa-brands fa-github"></i> <a href="https://github.com/Harshtaker" target="_blank">github.com/Harshtaker</a></li>
-          </ul>
-        </div>
-
-        <form class="contact-form" method="POST" action="https://formspree.io/f/mojjogdk">
-  <input type="hidden" name="_subject" value="New message from Portfolio Website">
-  <input type="hidden" name="_redirect" value="https://harshtaker.github.io/Portfolio/">
-
-
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input id="name" name="name" type="text" required />
-          </div>
-
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" required />
-          </div>
-
-          <div class="form-group">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" rows="4" required></textarea>
-          </div>
-
-          <button type="submit" class="btn primary-btn full-width">
-            Send Message <i class="fa-solid fa-paper-plane"></i>
-          </button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="container footer-container">
-      <p>© <span id="year"></span> Harsh Shukla. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>
